@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布租赁商品</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #f3f4f8;
+            color: #1d2129;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 48px 28px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 42px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-left h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .welcome-name {
+            color: #2563eb;
+            font-size: 15px;
+        }
+        .header-right a {
+            margin-left: 22px;
+            font-size: 15px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .form-card {
+            background: #fff;
+            border-radius: 20px;
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 32px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+        }
+        .form-card h3 {
+            font-size: 18px;
+            margin-bottom: 24px;
+            color: #111;
+        }
+        .form-item {
+            margin-bottom: 16px;
+        }
+        .form-item label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            font-size: 15px;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .tip-text {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #555;
+        }
+        .tip-red { color: #dc2626; }
+        .tip-green { color: #06c16d; }
+        /* 图片预览样式 */
+        .preview-box {
+            margin-top:10px;
+            display:none;
+        }
+        .preview-img {
+            max-width:240px;
+            border-radius:10px;
+            margin-top:8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h2>发布租赁商品</h2>
+        </div>
+        <div class="header-right">
+            <a href="/index">返回首页</a>
+            <a href="/logout">退出登录</a>
+        </div>
+    </header>
+
+    <div class="form-card">
+        <h3>填写商品信息</h3>
+        <div class="form-item">
+            <label>商品名称</label>
+            <input type="text" id="title" placeholder="请输入商品名称">
+        </div>
+        <div class="form-item">
+            <label>商品描述</label>
+            <textarea id="desc" placeholder="填写商品详情描述"></textarea>
+        </div>
+        <!-- 新增IPFS图片上传区块 -->
+        <div class="form-item">
+            <label>商品图片（可选，IPFS分布式存储）</label>
+            <input type="file" id="imgUpload" accept="image/png,image/jpg,image/jpeg,image/gif">
+            <p class="tip-text" id="imgTip"></p>
+            <div class="preview-box" id="previewBox">
+                <p>图片预览</p>
+                <img id="previewImg" class="preview-img">
+            </div>
+            <input type="hidden" id="imgCid" value="">
+        </div>
+        <div class="form-item">
+            <label>日租金（wei）</label>
+            <input type="number" id="daily_rent" min="1" placeholder="必须大于0">
+        </div>
+        <div class="form-item">
+            <label>租赁押金（wei）</label>
+            <input type="number" id="deposit" min="1" placeholder="必须大于0">
+        </div>
+        <button class="submit-btn" id="submitPublish">提交发布</button>
+        <p class="tip-text" id="publishingTip"></p>
+    </div>
+
+<script>
+    const showUser = document.getElementById("showUser");
+    const title = document.getElementById("title");
+    const desc = document.getElementById("desc");
+    const daily_rent = document.getElementById("daily_rent");
+    const deposit = document.getElementById("deposit");
+    const submitPublish = document.getElementById("submitPublish");
+    const publishingTip = document.getElementById("publishingTip");
+    // 图片上传DOM
+    const imgUpload = document.getElementById("imgUpload");
+    const imgTip = document.getElementById("imgTip");
+    const previewBox = document.getElementById("previewBox");
+    const previewImg = document.getElementById("previewImg");
+    const imgCid = document.getElementById("imgCid");
+
+    window.onload = async () => {
+        if (showUser) {
+            const userRes = await fetch("/get_user_info");
+            const userData = await userRes.json();
+            if(userData.code === 0){
+                showUser.innerText = `欢迎你，${userData.username}`;
+            }
+        }
+        const walletRes = await fetch("/get_bind_wallet");
+        const walletData = await walletRes.json();
+        if(!walletData.wallet_addr){
+            publishingTip.innerText = "请先去首页连接并绑定钱包";
+            publishingTip.className = "tip-text tip-red";
+            submitPublish.disabled = true;
+            submitPublish.style.opacity = 0.6;
+        }
+    }
+
+    // 图片选择自动上传IPFS
+    imgUpload.onchange = async function(){
+        const file = this.files[0];
+        if(!file) return;
+        imgTip.innerText = "正在上传图片至IPFS节点，请稍候...";
+        imgTip.className = "tip-text";
+        // 本地前端预览（不跨域，无需代理接口）
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+            previewImg.src = e.target.result;
+            previewBox.style.display = "block";
+        }
+        // 调用后端上传接口，拿到CID存入隐藏域
+        const formData = new FormData();
+        formData.append("itemImg", file);
+        try {
+            const res = await fetch("/api/upload_ipfs_img", {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            if(data.code === 0){
+                imgTip.innerText = `图片上传成功，CID：${data.cid}`;
+                imgTip.className = "tip-text tip-green";
+                imgCid.value = data.cid;
+            }else{
+                imgTip.innerText = data.msg;
+                imgTip.className = "tip-text tip-red";
+                imgCid.value = "";
+            }
+        } catch (err) {
+            imgTip.innerText = "上传失败，请确认ipfs daemon终端保持开启";
+            imgTip.className = "tip-text tip-red";
+            console.error("IPFS上传异常：", err);
+        }
+    }
+
+    submitPublish.onclick = async () => {
+        const t = title.value.trim();
+        const d = desc.value.trim();
+        const dr = parseInt(daily_rent.value);
+        const dp = parseInt(deposit.value);
+        const cid = imgCid.value;
+        publishingTip.innerText = "";
+        if(!t){
+            publishingTip.innerText = "商品名称不能为空";
+            publishingTip.className = "tip-text tip-red";
+            return;
+        }
+        if(isNaN(dr) || dr < 1 || isNaN(dp) || dp < 1){
+            publishingTip.innerText = "日租金、押金必须大于0";
+            publishingTip.className = "tip-text tip-red";
+            return;
+        }
+        publishingTip.innerText = "正在上链发布，请等待...";
+        publishingTip.className = "tip-text";
+        const fd = new FormData();
+        fd.append("title", t);
+        fd.append("desc", d);
+        fd.append("daily_rent", dr);
+        fd.append("deposit", dp);
+        // 追加图片CID，无图则传空字符串
+        fd.append("img_cid", cid);
+        try {
+            const res = await fetch("/publish_item", {method: "POST", body: fd});
+            const data = await res.json();
+            if(data.code === 0){
+                publishingTip.innerText = `发布成功！哈希：${data.tx_hash}`;
+                publishingTip.className = "tip-text tip-green";
+                setTimeout(()=>window.location.href="/index", 2000);
+            }else{
+                publishingTip.innerText = "发布失败：" + data.msg;
+                publishingTip.className = "tip-text tip-red";
+            }
+        } catch (err) {
+            publishingTip.innerText = "网络异常，请先绑定钱包";
+            publishingTip.className = "tip-text tip-red";
+            console.error("发布请求异常：", err);
+        }
+    }
+</script>
+</body>
+</html>

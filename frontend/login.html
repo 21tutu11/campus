@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 校园区块链租赁平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        body {
+            background-color: #f3f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+        }
+        .login-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .err-tip {
+            color: #dc2626;
+            text-align: center;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        .form-item {
+            margin-bottom: 18px;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 15px;
+            background: #f9fafb;
+            transition: border 0.25s;
+        }
+        .form-item input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.25s;
+            margin-top: 8px;
+        }
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+        .switch-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #52525b;
+        }
+        .switch-link a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 class="login-title">用户登录</h2>
+        <div class="err-tip" id="errMsg"></div>
+        <form id="loginForm" action="/login" method="POST">
+            <div class="form-item">
+                <input type="text" name="name" placeholder="请输入用户名" required>
+            </div>
+            <div class="form-item">
+                <input type="password" name="pwd" placeholder="请输入密码" required>
+            </div>
+            <button class="submit-btn" type="submit">登录</button>
+        </form>
+        <div class="switch-link">
+            没有账号？<a href="/register.html">前往注册</a>
+        </div>
+    </div>
+
+<script>
+    // 获取地址栏错误提示
+    const urlParams = new URLSearchParams(window.location.search);
+    const err = urlParams.get("err");
+    const tip = urlParams.get("tip");
+    const errDom = document.getElementById("errMsg");
+    if(err){
+        errDom.innerText = err;
+    }else if(tip){
+        errDom.style.color = "#16a34a";
+        errDom.innerText = tip;
+    }
+</script>
+</body>
+</html>

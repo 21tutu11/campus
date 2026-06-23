@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园区块链租赁平台 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #f3f4f8;
+            color: #1d2129;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 48px 28px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 42px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .header-left h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .welcome-name {
+            font-size: 15px;
+            color: #2563eb;
+        }
+        .header-right a {
+            margin-left: 22px;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .publishing-nav {
+            color: #2563eb;
+        }
+        .publishing-nav:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+        .logout-nav {
+            color: #6b7280;
+        }
+        .logout-nav:hover {
+            color: #2563eb;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+        }
+        .card h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 15px 18px;
+            margin-bottom: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 15px;
+            background: #f9fafb;
+            transition: border 0.25s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
+        }
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+        .primary-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 14px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.25s;
+        }
+        .primary-btn:hover {
+            background: #1d4ed8;
+        }
+        .tip-text {
+            margin-top: 14px;
+            font-size: 14px;
+            color: #555;
+        }
+        .goods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+        .goods-card {
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 24px;
+            background: #fff;
+            transition: all 0.25s;
+        }
+        .goods-card:hover {
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+        .goods-card h4 {
+            font-size: 17px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #111;
+        }
+        .goods-card p {
+            font-size: 14px;
+            color: #52525b;
+            margin: 8px 0;
+            line-height: 1.55;
+        }
+        .price-red {
+            color: #dc2626;
+            font-weight: 500;
+        }
+        .empty-text {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 70px 0;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+        /* 弹窗通用样式 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal {
+            width: 90%;
+            max-width: 420px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+        }
+        .modal h3 {
+            margin-bottom: 20px;
+        }
+        .modal label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .cancel-btn {
+            flex: 1;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        /* 立即租赁按钮原版样式 */
+        .rent-btn-card {
+            margin-top: 12px;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+        .rent-btn-card:hover {
+            background-color: #1d4ed8;
+        }
+        /* 本人商品操作按钮组 */
+        .self-btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .mini-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-off {background:#999;color:#fff;}
+        .btn-on {background:#06c16d;color:#fff;}
+        .btn-edit {background:#f5a623;color:#fff;}
+        /* 只读输入框 */
+        input[readonly] {
+            background-color: #f0f0f0 !important;
+            cursor: not-allowed;
+        }
+        /* 商品图片 */
+        .goods-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h2>校园区块链租赁平台</h2>
+            <span class="welcome-name" id="showUsername"></span>
+        </div>
+        <div class="header-right">
+            <a href="/publishing" class="publishing-nav">发布商品</a>
+            <a href="/order.html">我的订单</a>
+            <a href="/logout" class="logout-nav">退出登录</a>
+        </div>
+    </header>
+
+    <div class="card">
+        <h3>连接 MetaMask 钱包</h3>
+        <button class="primary-btn" id="connectBtn">连接钱包</button>
+        <p class="tip-text">已绑定钱包：<span id="walletText">未绑定</span></p>
+        <p class="tip-text" id="bindMsg"></p>
+    </div>
+
+    <div class="card">
+        <h3>全部商品</h3>
+        <div class="goods-grid" id="goodsContainer"></div>
+    </div>
+
+    <!-- 租赁弹窗（带可见租赁总金额） -->
+    <div class="mask" id="rentMask">
+        <div class="modal">
+            <h3>租赁商品</h3>
+            <input type="hidden" id="targetItemId">
+            <input type="hidden" id="itemDailyRent">
+            <input type="hidden" id="itemDeposit">
+            <input type="hidden" id="showTotal">
+            <label>商品日租金</label>
+            <input type="text" id="showDaily" readonly>
+            <label>担保押金</label>
+            <input type="text" id="showDeposit" readonly>
+            <label>租赁天数</label>
+            <input type="number" id="rentDay" placeholder="租赁天数（整数）" min="1" required>
+            <label>租赁总金额</label>
+            <input type="text" id="showTotalView" readonly value="0 wei">
+            <label>收件人姓名</label>
+            <input type="text" id="receiverName" placeholder="请填写收件人姓名">
+            <label>手机号码</label>
+            <input type="number" id="receiverPhone" placeholder="请填写联系手机号">
+            <label>收货详细地址</label>
+            <textarea id="receiverAddr" rows="2" placeholder="省/市/区/街道详细地址"></textarea>
+            <p class="tip-text" id="rentTip"></p>
+            <div class="btn-row">
+                <button class="cancel-btn" id="rentClose">取消</button>
+                <button class="primary-btn" id="rentSubmit">确认租赁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改商品弹窗 -->
+    <div class="mask" id="editMask">
+        <div class="modal">
+            <h3>修改商品</h3>
+            <input type="hidden" id="editItemId">
+            <label>商品图片（可重新上传替换）</label>
+            <input type="file" id="editImgUpload" accept="image/png,image/jpg,image/jpeg,image/gif">
+            <p class="tip-text" id="editImgTip"></p>
+            <div id="editImgPreviewBox" style="margin:10px 0;display:none;">
+                <p>当前预览图</p>
+                <img id="editPreviewImg" style="max-width:240px;border-radius:8px;">
+            </div>
+            <input type="hidden" id="editItemImgCid" value="">
+            <label>商品名称</label>
+            <input type="text" id="editTitle" placeholder="商品名称">
+            <label>商品描述</label>
+            <textarea id="editDesc" placeholder="商品描述"></textarea>
+            <label>日租金 (wei)</label>
+            <input type="number" id="editDaily" placeholder="新日租金 wei" min="1">
+            <label>租赁押金 (wei)</label>
+            <input type="number" id="editDeposit" placeholder="新押金 wei" min="1">
+            <p class="tip-text" id="editTip"></p>
+            <div class="btn-row">
+                <button class="cancel-btn" id="editClose">取消</button>
+                <button class="primary-btn" id="editSubmit">确认修改</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let bindWallet = "";
+    let loginUid = 0;
+    let currentDaily = 0;
+    let currentDeposit = 0;
+    const connectBtn = document.getElementById("connectBtn");
+    const walletText = document.getElementById("walletText");
+    const bindMsg = document.getElementById("bindMsg");
+    const goodsContainer = document.getElementById("goodsContainer");
+    const showUsername = document.getElementById("showUsername");
+
+    // 租赁弹窗DOM全部定义
+    const rentMask = document.getElementById("rentMask");
+    const rentClose = document.getElementById("rentClose");
+    const rentSubmit = document.getElementById("rentSubmit");
+    const rentDay = document.getElementById("rentDay");
+    const targetItemId = document.getElementById("targetItemId");
+    const itemDailyRent = document.getElementById("itemDailyRent");
+    const itemDeposit = document.getElementById("itemDeposit");
+    const rentTip = document.getElementById("rentTip");
+    const showDaily = document.getElementById("showDaily");
+    const showDeposit = document.getElementById("showDeposit");
+    const showTotal = document.getElementById("showTotal");
+    const showTotalView = document.getElementById("showTotalView");
+    const receiverName = document.getElementById("receiverName");
+    const receiverPhone = document.getElementById("receiverPhone");
+    const receiverAddr = document.getElementById("receiverAddr");
+
+    // 编辑弹窗DOM
+    const editMask = document.getElementById("editMask");
+    const editClose = document.getElementById("editClose");
+    const editSubmit = document.getElementById("editSubmit");
+    const editItemId = document.getElementById("editItemId");
+    const editTitle = document.getElementById("editTitle");
+    const editDesc = document.getElementById("editDesc");
+    const editDaily = document.getElementById("editDaily");
+    const editDeposit = document.getElementById("editDeposit");
+    const editTip = document.getElementById("editTip");
+    const editImgUpload = document.getElementById("editImgUpload");
+    const editImgTip = document.getElementById("editImgTip");
+    const editImgPreviewBox = document.getElementById("editImgPreviewBox");
+    const editPreviewImg = document.getElementById("editPreviewImg");
+    const editItemImgCid = document.getElementById("editItemImgCid");
+
+    window.onload = async () => {
+        const userInfoRes = await fetch("/get_user_info");
+        const userInfo = await userInfoRes.json();
+        if(userInfo.code === 0 && userInfo.username){
+            loginUid = userInfo.uid;
+            showUsername.innerText = `欢迎你，${userInfo.username}`;
+        }
+        const walletInfoRes = await fetch("/get_bind_wallet");
+        const walletInfo = await walletInfoRes.json();
+        if(walletInfo.code === 0){
+            bindWallet = walletInfo.wallet_addr;
+            walletText.innerText = bindWallet || "未绑定";
+            if(bindWallet) bindMsg.innerText = "钱包绑定成功";
+        }
+        await loadAllGoods();
+    }
+
+    async function refreshGoods() {
+        await loadAllGoods();
+    }
+
+    async function loadAllGoods() {
+        goodsContainer.innerHTML = "<div class='empty-text'>加载中...</div>";
+        try {
+            const res = await fetch("/get_all_items");
+            const data = await res.json();
+            const list = data.list || [];
+            if (list.length === 0) {
+                goodsContainer.innerHTML = "<div class='empty-text'>暂无上架商品</div>";
+                return;
+            }
+            goodsContainer.innerHTML = "";
+            list.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "goods-card";
+                let bottomHtml = "";
+                let imgHtml = "";
+                if(item.img_cid && item.img_cid !== ""){
+                    imgHtml = `<img src="/ipfs_proxy?cid=${item.img_cid}" class="goods-img" alt="商品图片">`;
+                }else{
+                    imgHtml = `<p style="color:#999;text-align:center;margin-bottom:10px;">暂无商品图片</p>`;
+                }
+                if (item.uid === loginUid) {
+                    if(item.on_shelf == 1){
+                        bottomHtml = `
+                            <div class="self-btn-group">
+                                <button class="mini-btn btn-off" data-id="${item.chain_id}" data-type="off">下架</button>
+                                <button class="mini-btn btn-edit" data-type="edit" data-id="${item.chain_id}" data-daily="${item.daily_rent}" data-dep="${item.deposit}" data-cid="${item.img_cid}">修改</button>
+                            </div>
+                        `;
+                    }else{
+                        bottomHtml = `
+                            <div class="self-btn-group">
+                                <button class="mini-btn btn-on" data-id="${item.chain_id}" data-type="on">重新上架</button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    if (item.on_shelf === 1) {
+                        bottomHtml = `<button class="rent-btn-card" data-id="${item.chain_id}" data-daily="${item.daily_rent}" data-dep="${item.deposit}">立即租赁</button>`;
+                    } else {
+                        if(item.is_rented === 1){
+                            bottomHtml = `<p style="color:#999;text-align:center;margin-top:12px;">商品已租出</p>`;
+                        }else{
+                            bottomHtml = `<p style="color:#999;text-align:center;margin-top:12px;">商品已下架</p>`;
+                        }
+                    }
+                }
+                card.innerHTML = `
+                    ${imgHtml}
+                    <h4>${item.title}</h4>
+                    <p>${item.desc || "无商品描述"}</p>
+                    <p class="price-red">日租金：${item.daily_rent} wei</p>
+                    <p>押金：${item.deposit} wei</p>
+                    <p>发布人：${item.publisher_name}</p>
+                    <p>发布时间：${item.create_time}</p>
+                    ${bottomHtml}
+                `;
+                goodsContainer.appendChild(card);
+            })
+            bindAllBtnEvent();
+        } catch (err) {
+            goodsContainer.innerHTML = "<div class='empty-text' style='color:#dc2626;'>商品列表加载失败</div>";
+            console.error("加载商品异常：", err);
+        }
+    }
+
+    function bindAllBtnEvent(){
+        document.querySelectorAll(".rent-btn-card").forEach(btn=>{
+            btn.onclick = function(){
+                if(!bindWallet){
+                    alert("请先绑定钱包后再租赁商品");
+                    return;
+                }
+                targetItemId.value = this.dataset.id;
+                currentDaily = parseInt(this.dataset.daily);
+                currentDeposit = parseInt(this.dataset.dep);
+                itemDailyRent.value = currentDaily;
+                itemDeposit.value = currentDeposit;
+                showDaily.value = currentDaily + " wei";
+                showDeposit.value = currentDeposit + " wei";
+                rentDay.value = "";
+                showTotalView.value = "0 wei";
+                receiverName.value = "";
+                receiverPhone.value = "";
+                receiverAddr.value = "";
+                rentTip.innerText = "";
+                rentMask.style.display = "flex";
+            }
+        })
+        document.querySelectorAll(".mini-btn").forEach(btn=>{
+            btn.onclick = async function(){
+                const cid = this.dataset.id;
+                const type = this.dataset.type;
+                if(type == "off"){
+                    const fd = new FormData();
+                    fd.append("item_id", cid);
+                    const r = await fetch("/off_shelf", {method:"POST", body:fd});
+                    const ret = await r.json();
+                    alert(ret.msg);
+                    refreshGoods();
+                }else if(type == "on"){
+                    const fd = new FormData();
+                    fd.append("item_id", cid);
+                    const r = await fetch("/on_shelf", {method:"POST", body:fd});
+                    const ret = await r.json();
+                    alert(ret.msg);
+                    refreshGoods();
+                }else if(type == "edit"){
+                    try{
+                        const oldCid = this.dataset.cid;
+                        editItemImgCid.value = oldCid;
+                        if(oldCid){
+                            editPreviewImg.src = `/ipfs_proxy?cid=${oldCid}`;
+                            editImgPreviewBox.style.display = "block";
+                        }else{
+                            editImgPreviewBox.style.display = "none";
+                        }
+                        const parentCard = this.closest(".goods-card");
+                        let descText = parentCard.querySelectorAll("p")[0].innerText.trim();
+                        if(descText === "无商品描述") descText = "";
+                        editItemId.value = cid;
+                        editTitle.value = parentCard.querySelector("h4").innerText;
+                        editDesc.value = descText;
+                        editDaily.value = this.dataset.daily;
+                        editDeposit.value = this.dataset.dep;
+                    }catch(e){
+                        editItemImgCid.value = "";
+                        editImgPreviewBox.style.display = "none";
+                        editItemId.value = cid;
+                        editDesc.value = "";
+                        editDaily.value = this.dataset.daily;
+                        editDeposit.value = this.dataset.dep;
+                        console.error("读取卡片DOM失败", e);
+                    }
+                    editImgTip.innerText = "";
+                    editTip.innerText = "";
+                    editMask.style.display = "flex";
+                }
+            }
+        })
+    }
+
+    editImgUpload.onchange = async function(){
+        const file = this.files[0];
+        if(!file) return;
+        editImgTip.innerText = "正在上传IPFS节点...";
+        editImgTip.style.color="#2563eb";
+        const fd = new FormData();
+        fd.append("itemImg",file);
+        try{
+            const res = await fetch("/api/upload_ipfs_img",{
+                method:"POST",
+                body:fd
+            });
+            const data = await res.json();
+            if(data.code === 0){
+                editImgTip.innerText = "图片上传IPFS成功";
+                editImgTip.style.color="#06c16d";
+                editItemImgCid.value = data.cid;
+                editPreviewImg.src = data.imgUrl;
+                editImgPreviewBox.style.display = "block";
+            }else{
+                editImgTip.innerText = data.msg;
+                editImgTip.style.color="#dc2626";
+            }
+        }catch(err){
+            editImgTip.innerText = "后端请求失败，请确认ipfs daemon终端保持开启";
+            editImgTip.style.color="#dc2626";
+            console.error(err);
+        }
+    }
+
+    rentClose.onclick = ()=> rentMask.style.display = "none";
+    editClose.onclick = ()=> editMask.style.display = "none";
+
+    // 实时计算总价：全部使用 window.isNaN
+    rentDay.oninput = function(){
+        const days = parseInt(this.value);
+        if(window.isNaN(days) || days < 1){
+            showTotal.value = "0 wei";
+            showTotalView.value = "0 wei";
+            return;
+        }
+        const total = currentDaily * days + currentDeposit;
+        showTotal.value = total + " wei";
+        showTotalView.value = total + " wei";
+    }
+
+    // 确认租赁提交，彻底修复isNaN报错
+    rentSubmit.onclick = async ()=>{
+        const days = parseInt(rentDay.value);
+        const name = receiverName.value.trim();
+        const phone = receiverPhone.value.trim();
+        const addr = receiverAddr.value.trim();
+        // 标准全局判断，无裸写isNaN
+        if(window.isNaN(days) || days < 1){
+            rentTip.innerText = "请输入大于0的租赁天数";
+            rentTip.style.color = "#dc2626";
+            return;
+        }
+        if(!name || !phone || !addr){
+            rentTip.innerText = "收件人、手机号、收货地址不能为空";
+            rentTip.style.color = "#dc2626";
+            return;
+        }
+        rentTip.innerText = "交易上链中，请稍候...";
+        rentTip.style.color = "#2563eb";
+        const formData = new FormData();
+        formData.append("item_id", targetItemId.value);
+        formData.append("rent_days", days);
+        formData.append("receiver_name", name);
+        formData.append("receiver_phone", phone);
+        formData.append("receiver_addr", addr);
+        const res = await fetch("/create_rent", {method: "POST", body: formData});
+        const ret = await res.json();
+        if(ret.code === 0){
+            rentTip.innerText = "租赁成功，交易哈希："+ret.tx_hash;
+            rentTip.style.color = "#06c16d";
+            setTimeout(()=>{rentMask.style.display="none";refreshGoods();},2000)
+        }else{
+            rentTip.innerText = ret.msg;
+            rentTip.style.color = "#dc2626";
+        }
+    }
+
+    editSubmit.onclick = async ()=>{
+        const cid = editItemId.value;
+        const title = editTitle.value.trim();
+        const desc = editDesc.value.trim();
+        const new_daily = parseInt(editDaily.value);
+        const new_deposit = parseInt(editDeposit.value);
+        const new_img_cid = editItemImgCid.value;
+        if(!title){
+            editTip.innerText = "商品名称不能为空";
+            editTip.style.color = "#dc2626";
+            return;
+        }
+        // 编辑表单统一window.isNaN
+        if(window.isNaN(new_daily) || new_daily <1 || window.isNaN(new_deposit) || new_deposit <1){
+            editTip.innerText = "租金、押金必须大于0";
+            editTip.style.color = "#dc2626";
+            return;
+        }
+        editTip.innerText = "链上更新中...";
+        editTip.style.color = "#2563eb";
+        const fd = new FormData();
+        fd.append("item_id", cid);
+        fd.append("title", title);
+        fd.append("desc", desc);
+        fd.append("daily_rent", new_daily);
+        fd.append("deposit", new_deposit);
+        fd.append("img_cid", new_img_cid);
+        const res = await fetch("/edit_item", {method:"POST", body:fd});
+        const ret = await res.json();
+        if(ret.code == 0){
+            editTip.innerText = "商品修改成功，哈希："+ret.tx_hash;
+            editTip.style.color = "#06c16d";
+            setTimeout(()=>{editMask.style.display="none";refreshGoods();},2000)
+        }else{
+            editTip.innerText = ret.msg;
+            editTip.style.color = "#dc2626";
+        }
+    }
+
+    connectBtn.onclick = async () => {
+        if (!window.ethereum) {
+            bindMsg.innerText = "当前浏览器未安装 MetaMask";
+            bindMsg.style.color = "#dc2626";
+            return;
+        }
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const addr = await signer.getAddress();
+            const checkFd = new FormData();
+            checkFd.append("wallet_addr", addr);
+            const checkRes = await fetch("/check_wallet_used", {method:"POST", body:checkFd});
+            const checkData = await checkRes.json();
+            if(checkData.used){
+                bindWallet = "";
+                walletText.innerText = "未绑定";
+                bindMsg.innerText = "该钱包已绑定其他账号，无法重复绑定";
+                bindMsg.style.color = "#dc2626";
+                return;
+            }
+            bindWallet = addr;
+            walletText.innerText = addr;
+            const formData = new FormData();
+            formData.append("wallet_addr", addr);
+            const bindRes = await fetch("/bind_wallet", {method: "POST", body: formData});
+            const bindData = await bindRes.json();
+            bindMsg.innerText = bindData.msg;
+            bindMsg.style.color = "#06c16d";
+        } catch (err) {
+            bindMsg.innerText = "连接失败：" + err.message;
+            bindMsg.style.color = "#dc2626";
+        }
+    }
+</script>
+</body>
+</html>

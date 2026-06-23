@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的租赁订单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #f3f4f8;
+            color: #1d2129;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 48px 28px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 42px;
+        }
+        .header-left h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .header-right a {
+            font-size: 15px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+        }
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #111;
+        }
+        .order-item p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+        }
+        .split-line {
+            margin: 14px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+        .total-text {
+            color: #2563eb;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .status-finish {
+            color: #06c16d;
+            font-weight: 500;
+        }
+        .status-wait {
+            color: #dc2626;
+            font-weight: 500;
+        }
+        .return-btn {
+            margin-top: 12px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+        .empty {
+            text-align: center;
+            padding: 60px 0;
+            color: #999;
+            font-size: 16px;
+        }
+        /* 归还弹窗 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal {
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+        }
+        .modal h3 {
+            margin-bottom: 12px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .cancel {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+        .confirm {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+        .tip {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h2>我的租赁订单</h2>
+        </div>
+        <div class="header-right">
+            <a href="/index">← 返回首页</a>
+        </div>
+    </header>
+
+    <div id="orderList"></div>
+
+    <!-- 归还确认弹窗 -->
+    <div class="mask" id="returnMask">
+        <div class="modal">
+            <h3>确认归还商品</h3>
+            <p>归还后商品重新上架，全额押金原路退回你的钱包</p>
+            <input type="hidden" id="targetChainOrderId">
+            <p class="tip" id="returnTip"></p>
+            <div class="btn-row">
+                <button class="cancel" id="closeReturn">取消</button>
+                <button class="confirm" id="submitReturn">确认归还</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const orderList = document.getElementById("orderList");
+    const returnMask = document.getElementById("returnMask");
+    const closeReturn = document.getElementById("closeReturn");
+    const submitReturn = document.getElementById("submitReturn");
+    const targetChainOrderId = document.getElementById("targetChainOrderId");
+    const returnTip = document.getElementById("returnTip");
+
+    window.onload = async () => {
+        await loadOrders();
+    }
+
+    async function loadOrders() {
+        const res = await fetch("/get_my_rent");
+        const data = await res.json();
+        const list = data.list;
+        if(list.length === 0){
+            orderList.innerHTML = `<div class="empty">暂无租赁订单</div>`;
+            return;
+        }
+        orderList.innerHTML = "";
+        list.forEach(item => {
+            const statusText = item.status === 1 ? `<span class="status-finish">已归还</span>` : `<span class="status-wait">待归还</span>`;
+            let btnHtml = "";
+            if(item.status === 0){
+                btnHtml = `<button class="return-btn" data-cid="${item.chain_order_id}">归还商品</button>`;
+            }
+            const div = document.createElement("div");
+            div.className = "card order-item";
+            div.innerHTML = `
+                <h3>商品：${item.title}</h3>
+                <p>租赁天数：${item.rent_day} 天</p>
+                <p>日租金：${item.daily_rent} wei</p>
+                <p>担保押金：${item.deposit} wei</p>
+                <p class="total-text">下单合计展示金额（租金+押金）：${item.total_pay} wei</p>
+                <hr class="split-line">
+                <p><strong>收货信息</strong></p>
+                <p>收件人：${item.receiver_name}</p>
+                <p>联系电话：${item.receiver_phone}</p>
+                <p>收货地址：${item.receiver_addr}</p>
+                <hr class="split-line">
+                <p>创建时间：${item.ctime}</p>
+                <p>链上交易哈希：${item.tx}</p>
+                <p>订单状态：${statusText}</p>
+                ${btnHtml}
+            `;
+            orderList.appendChild(div);
+        })
+        bindReturnBtn();
+    }
+
+    // 绑定归还按钮点击事件
+    function bindReturnBtn(){
+        document.querySelectorAll(".return-btn").forEach(btn=>{
+            btn.onclick = function(){
+                targetChainOrderId.value = this.dataset.cid;
+                returnTip.innerText = "";
+                returnMask.style.display = "flex";
+            }
+        })
+    }
+
+    // 关闭归还弹窗
+    closeReturn.onclick = ()=>{
+        returnMask.style.display = "none";
+    }
+
+    // 提交归还请求
+    submitReturn.onclick = async ()=>{
+        const cid = targetChainOrderId.value;
+        returnTip.innerText = "链上处理中，请等待...";
+        returnTip.style.color = "#2563eb";
+        const fd = new FormData();
+        fd.append("chain_order_id", cid);
+        const res = await fetch("/return_goods", {method:"POST", body:fd});
+        const ret = await res.json();
+        if(ret.code === 0){
+            returnTip.innerText = "归还成功！全额押金已退回钱包，交易哈希：" + ret.tx_hash;
+            returnTip.style.color = "#06c16d";
+            setTimeout(()=>{
+                returnMask.style.display = "none";
+                loadOrders();
+            },2000)
+        }else{
+            returnTip.innerText = "归还失败：" + ret.msg;
+            returnTip.style.color = "#dc2626";
+        }
+    }
+</script>
+</body>
+</html>

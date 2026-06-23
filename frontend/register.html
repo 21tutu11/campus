@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 校园区块链租赁平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        body {
+            background-color: #f3f4f8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .reg-card {
+            width: 100%;
+            max-width: 440px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+        }
+        .reg-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-item {
+            margin-bottom: 18px;
+        }
+        .form-item input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 15px;
+            background: #f9fafb;
+            transition: border 0.25s;
+        }
+        .form-item input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.25s;
+            margin-top: 8px;
+        }
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+        .switch-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #52525b;
+        }
+        .switch-link a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .switch-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="reg-card">
+        <h2 class="reg-title">用户注册</h2>
+        <form id="regForm">
+            <div class="form-item">
+                <input type="text" id="username" placeholder="设置用户名" required>
+            </div>
+            <div class="form-item">
+                <input type="password" id="pwd" placeholder="设置密码" required>
+            </div>
+            <div class="form-item">
+                <input type="email" id="mail" placeholder="邮箱（选填）">
+            </div>
+            <button class="submit-btn" type="submit">完成注册</button>
+        </form>
+        <div class="switch-link">
+            已有账号？<a href="/login.html">前往登录</a>
+        </div>
+    </div>
+
+<script>
+    const form = document.getElementById("regForm");
+    form.onsubmit = async function(e){
+        e.preventDefault();
+        const data = {
+            name: document.getElementById("username").value,
+            pwd: document.getElementById("pwd").value,
+            mail: document.getElementById("mail").value
+        };
+        const res = await fetch("/register", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(data)
+        });
+        const ret = await res.json();
+        alert(ret.msg);
+        if(ret.code === 0){
+            location.href = ret.url;
+        }
+    }
+</script>
+</body>
+</html>
